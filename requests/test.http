@@ -41,3 +41,23 @@ Content-Type: image/jpeg
 
 < ./docs/mocks/imagen.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Contenido de ruta protegida con token
+GET {{baseUrl}}/api/v1/files/2/6dd5d73a-95b4-4684-9566-6043ae55de84.jpg
+Content-Type: image/jpeg
+Authorization: Bearer {{token}}
+
+### Contenido de ruta protegida sin token 
+GET {{baseUrl}}/api/v1/files/2/6dd5d73a-95b4-4684-9566-6043ae55de84.jpg
+Content-Type: image/jpeg
+
+### Contenido de ruta protegida con token
+GET {{baseUrl}}/api/v1/files/2/02df7dfb-de5a-4f66-8e71-a88453c8c93f.pdf
+Content-Type: application/pdf
+Authorization: Bearer {{token}}
+
+### Contenido de ruta protegida sin token 
+GET {{baseUrl}}/api/v1/files/2/02df7dfb-de5a-4f66-8e71-a88453c8c93f.pdf
+Content-Type: application/pdf
+
+

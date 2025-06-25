@@ -3,6 +3,7 @@ require 'json'
 require 'jwt'
 require 'logger'
 require 'dotenv/load'
+require 'rack/utils'
 
 class ApplicationController < Sinatra::Base
   # Habilitar logging
@@ -15,7 +16,7 @@ class ApplicationController < Sinatra::Base
   configure do
     set :session_secret, 'a4b89e6d2f4c7b98334f5e2c1e93460b2f94b24a6c9e5d073c44d4e69e839485'
     set :sessions, expire_after: 3600
-    set :public_folder, File.join(Dir.pwd, 'public')
+    set :public_folder, File.join(Dir.pwd, 'uploads')
     set :constants, CONSTANTS[:local]
     set :auth_header, ENV['AUTH_HEADER']
     set :jwt_secret, ENV['JWT_SECRET']
@@ -62,21 +63,21 @@ class ApplicationController < Sinatra::Base
   end
 
   before '/api/v1/files/*' do
-    begin
-      auth_header = request.env['HTTP_AUTHORIZATION']
-      halt 401, { error: 'Missing Authorization header' }.to_json unless auth_header
+    authenticate!
+  end
 
-      token = auth_header.gsub(/^Bearer\s/, '') # Remueve "Bearer " si está presente
-
-      decoded_token = JWT.decode(token, settings.jwt_secret, true, algorithm: 'HS256')
-
-      # Guardar información del token para usarla en la ruta (opcional)
-      @current_user = decoded_token[0]['sub'] # por ejemplo
-    rescue JWT::DecodeError => e
-      halt 401, { error: 'Invalid token', message: e.message }.to_json
-    rescue => e
-      halt 500, { error: 'Internal server error', message: e.message }.to_json
+  get '/api/v1/files/:issue_id/:file_name' do
+    issue_id = params[:issue_id]
+    file_name = params[:file_name]
+    # Carpeta donde están los archivos subidos
+    upload_dir = File.join(Dir.pwd,'uploads', issue_id)
+    file_path = File.join(upload_dir, file_name)
+    unless File.exist?(file_path) && File.readable?(file_path)
+      halt 404, { error: "File not found or not accessible" }.to_json
     end
+    content_type MIME::Types.type_for(file_name).first.to_s || 'application/octet-stream'
+    # Sirve el archivo como binario
+    send_file file_path
   end
 
   post '/api/v1/files/:issue_id' do
@@ -92,7 +93,7 @@ class ApplicationController < Sinatra::Base
       extension = File.extname(original_filename)
       random_name = SecureRandom.uuid + extension
       # Crear directorio si no existe
-      upload_dir = File.join('public', 'uploads', "#{issue_id}")
+      upload_dir = File.join('uploads', "#{issue_id}")
       FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
       # Ruta completa del archivo
       file_path = File.join(upload_dir, random_name)

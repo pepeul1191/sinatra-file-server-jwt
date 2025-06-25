@@ -15,7 +15,7 @@ public/dist
 *.lock
 public/build
 public/fonts
-public/uploads
+uploads
 tmp
 
 public/vendor
