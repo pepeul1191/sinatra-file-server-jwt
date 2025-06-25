@@ -113,4 +113,13 @@ class ApplicationController < Sinatra::Base
       { error: "Error al procesar el archivo: #{e.message}" }.to_json
     end
   end
+
+  not_found do
+    content_type :json
+    status 404
+    { 
+      message: 'Recurso no encontrado', 
+      error: "#{request.request_method} #{request.path} no existe"
+    }.to_json
+  end
 end
