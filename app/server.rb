@@ -49,7 +49,7 @@ class ApplicationController < Sinatra::Base
       }
       begin
         token = JWT.encode claims, settings.jwt_secret, 'HS256'
-        { status: 'success', token: token }.to_json
+        { token: token }.to_json
       rescue => e
         puts "Failed to encode JWT: #{e.message}"
         halt 500, { error: 'Failed to generate token' }.to_json
@@ -58,6 +58,45 @@ class ApplicationController < Sinatra::Base
       puts "Unauthorized access attempt. Invalid or missing X-Auth-Trigger."
       status 401
       { error: 'Unauthorized', message: 'Invalid or missing X-Auth-Trigger' }.to_json
+    end
+  end
+
+  post '/api/v1/files/:issue_id' do
+    # Verificar si se envió un archivo
+    puts '1 +++++++++++++++++++++++++++++++++++++'
+    puts params[:file]
+    puts '2 +++++++++++++++++++++++++++++++++++++'
+    unless params[:file] && params[:file][:tempfile]
+      puts '++++++++++++++++++'
+      halt 400, { error: 'No se proporcionó ningún archivo' }.to_json
+    end
+    issue_id = params[:issue_id]
+    uploaded_file = params[:file]
+    begin
+      # Obtener la extensión original del archivo
+      original_filename = uploaded_file[:filename]
+      extension = File.extname(original_filename)
+      random_name = SecureRandom.uuid + extension
+      # Crear directorio si no existe
+      upload_dir = File.join('public', 'uploads', "#{issue_id}")
+      FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
+      # Ruta completa del archivo
+      file_path = File.join(upload_dir, random_name)
+      # Guardar el archivo
+      File.open(file_path, 'wb') do |f|
+        f.write(uploaded_file[:tempfile].read)
+      end
+      # Devolver la ruta relativa (sin 'public')
+      {
+        status: 'success',
+        filename: random_name,
+        path: "/uploads/issue_#{issue_id}/#{random_name}",
+        original_filename: original_filename,
+        size: File.size(file_path)
+      }.to_json
+    rescue => e
+      status 500
+      { error: "Error al procesar el archivo: #{e.message}" }.to_json
     end
   end
 end

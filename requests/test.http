@@ -11,7 +11,7 @@ X-Auth-Trigger: {{xauth}}
 
 
 ### Cargar archivo con JWT y issue_id
-POST {{baseUrl}}/api/v1/files
+POST {{baseUrl}}/api/v1/files/2
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 Authorization: Bearer {{token}}
 
@@ -23,5 +23,5 @@ mi-id-de-proyecto-123
 Content-Disposition: form-data; name="file"; filename="documento.pdf"
 Content-Type: application/pdf
 
-< ./ruta/a/tu/documento.pdf
+< ./docs/mocks/archivo.pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
