@@ -1,4 +1,4 @@
-# Gestión de Ticktes - Ruby/MongoDB
+# Servidor de Recepción de Archivos
 
 - [Documentación](#documentación)
 
