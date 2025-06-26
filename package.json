@@ -1,0 +1,23 @@
+{
+  "name": "files",
+  "version": "1.0.0",
+  "description": "- [Documentación](#documentación)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "rake server:development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pepeul1191/sinatra-file-server-jwt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pepeul1191/sinatra-file-server-jwt/issues"
+  },
+  "homepage": "https://github.com/pepeul1191/sinatra-file-server-jwt#readme"
+}

@@ -4,14 +4,17 @@ require 'jwt'
 require 'logger'
 require 'dotenv/load'
 require 'rack/utils'
+require 'sinatra/cross_origin'
+require 'sinatra/cors'
 
 class ApplicationController < Sinatra::Base
+  register Sinatra::CrossOrigin
+
   # Habilitar logging
   configure :development, :production do
     enable :logging
+    enable :cross_origin
   end
-
-  enable :sessions # Habilitar sesiones
 
   configure do
     set :session_secret, 'a4b89e6d2f4c7b98334f5e2c1e93460b2f94b24a6c9e5d073c44d4e69e839485'
@@ -23,9 +26,21 @@ class ApplicationController < Sinatra::Base
   end
 
   before do
-    env["rack.logger"] = Logger.new(STDOUT)
+    content_type :json
   end
 
+  # Manejo de preflight (OPTIONS)
+  options '/api/v1/*' do
+    # No necesitas autenticación aquí
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    200
+  end
+
+  enable :sessions # Habilitar sesiones
+  
   helpers Helpers
 
   get '/' do
@@ -33,7 +48,7 @@ class ApplicationController < Sinatra::Base
     'hol'
   end
 
-  post '/api/v1/sign-in' do
+  post '/api/v1/auth/generate-token' do
     incoming_auth = request.env['HTTP_X_AUTH_TRIGGER']
     # puts "Incoming X-Auth-Trigger: #{incoming_auth}"
     # puts "Expected AUTH_HEADER: #{settings.auth_header}"
@@ -62,15 +77,11 @@ class ApplicationController < Sinatra::Base
     end
   end
 
-  before '/api/v1/files/*' do
-    authenticate!
-  end
-
-  get '/api/v1/files/:issue_id/:file_name' do
-    issue_id = params[:issue_id]
+  get '/api/v1/files/:folder/:file_name' do
+    folder = params[:folder]
     file_name = params[:file_name]
     # Carpeta donde están los archivos subidos
-    upload_dir = File.join(Dir.pwd,'uploads', issue_id)
+    upload_dir = File.join(Dir.pwd,'uploads', folder)
     file_path = File.join(upload_dir, file_name)
     unless File.exist?(file_path) && File.readable?(file_path)
       halt 404, { error: "File not found or not accessible" }.to_json
@@ -80,12 +91,13 @@ class ApplicationController < Sinatra::Base
     send_file file_path
   end
 
-  post '/api/v1/files/:issue_id' do
+  post '/api/v1/files' do
+    authenticate!
     # Verificar si se envió un archivo
     unless params[:file] && params[:file][:tempfile]
       halt 400, { error: 'No se proporcionó ningún archivo' }.to_json
     end
-    issue_id = params[:issue_id]
+    folder = params[:folder]
     uploaded_file = params[:file]
     begin
       # Obtener la extensión original del archivo
@@ -93,7 +105,7 @@ class ApplicationController < Sinatra::Base
       extension = File.extname(original_filename)
       random_name = SecureRandom.uuid + extension
       # Crear directorio si no existe
-      upload_dir = File.join('uploads', "#{issue_id}")
+      upload_dir = File.join('uploads', "#{folder}")
       FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
       # Ruta completa del archivo
       file_path = File.join(upload_dir, random_name)
@@ -105,7 +117,7 @@ class ApplicationController < Sinatra::Base
       {
         status: 'success',
         filename: random_name,
-        path: "/uploads/issue_#{issue_id}/#{random_name}",
+        path: "/uploads/#{folder}/#{random_name}",
         original_filename: original_filename,
         size: File.size(file_path)
       }.to_json

@@ -1,10 +1,10 @@
 @baseUrl = http://localhost:8090
 @session = mysession=MTc0OTg1Nzc5MHxEWDhFQVFMX2dBQUJFQUVRQUFBb180QUFBUVp6ZEhKcGJtY01DQUFHYzNSaGRIVnpCbk4wY21sdVp3d0tBQWhoWTNScGRtRjBaUT09fMsOMrySaZXb7iVqWPzRGdBZzMNWzsX53YvrKgdxuykg
 @xauth = dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
-@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ5b3VyLWFwcC5jb20iLCJhdWQiOiJ5b3VyLWNsaWVudC1pZCIsInN1YiI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3NTA4MjA2NDMsImlhdCI6MTc1MDgxNzA0MywidXNlcl9pZCI6MTIzLCJyb2xlIjoiYWRtaW4ifQ.V3C-ck3DGOUvEki8e4ecGCXvRafyW0fh38my9Xkiz78
+@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ5b3VyLWFwcC5jb20iLCJhdWQiOiJ5b3VyLWNsaWVudC1pZCIsInN1YiI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3NTA5MTA3NjksImlhdCI6MTc1MDkwNzE2OSwidXNlcl9pZCI6MTIzLCJyb2xlIjoiYWRtaW4ifQ.Hions_Dl2m76MPWF97GfECt3tihvbEnDys-92l4Ta8E
 
 ### Crear token
-POST {{baseUrl}}/api/v1/sign-in
+POST {{baseUrl}}/api/v1/auth/generate-token
 Content-Type: application/json
 Cookie: {{session}}
 X-Auth-Trigger: {{xauth}}
