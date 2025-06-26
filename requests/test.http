@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:8090
 @session = mysession=MTc0OTg1Nzc5MHxEWDhFQVFMX2dBQUJFQUVRQUFBb180QUFBUVp6ZEhKcGJtY01DQUFHYzNSaGRIVnpCbk4wY21sdVp3d0tBQWhoWTNScGRtRjBaUT09fMsOMrySaZXb7iVqWPzRGdBZzMNWzsX53YvrKgdxuykg
 @xauth = dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
-@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ5b3VyLWFwcC5jb20iLCJhdWQiOiJ5b3VyLWNsaWVudC1pZCIsInN1YiI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3NTA5MTA3NjksImlhdCI6MTc1MDkwNzE2OSwidXNlcl9pZCI6MTIzLCJyb2xlIjoiYWRtaW4ifQ.Hions_Dl2m76MPWF97GfECt3tihvbEnDys-92l4Ta8E
+@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ5b3VyLWFwcC5jb20iLCJhdWQiOiJ5b3VyLWNsaWVudC1pZCIsInN1YiI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3NTA5NzIxNTUsImlhdCI6MTc1MDk2ODU1NSwidXNlcl9pZCI6MTIzLCJyb2xlIjoiYWRtaW4ifQ.x7MHIpu6SnIYUTTSZWzanCj-5ZWiuMHGA4xlKQpedzY
 
 ### Crear token
 POST {{baseUrl}}/api/v1/auth/generate-token
@@ -11,14 +11,14 @@ X-Auth-Trigger: {{xauth}}
 
 
 ### Cargar pdf con JWT y issue_id
-POST {{baseUrl}}/api/v1/files/2
+POST {{baseUrl}}/api/v1/files
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 Authorization: Bearer {{token}}
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="issue_id"
+Content-Disposition: form-data; name="folder"
 
-mi-id-de-proyecto-123
+folder=mi-id-de-proyecto-123
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="file"; filename="documento.pdf"
 Content-Type: application/pdf

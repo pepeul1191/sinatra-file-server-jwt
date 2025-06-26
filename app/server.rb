@@ -25,8 +25,12 @@ class ApplicationController < Sinatra::Base
     set :jwt_secret, ENV['JWT_SECRET']
   end
 
-  before do
-    content_type :json
+  before '/api/v1/*' do
+    request_method = request.request_method
+    if %w[GET POST PUT DELETE].include?(request_method)
+      authenticate!
+      content_type :json
+    end
   end
 
   # Manejo de preflight (OPTIONS)
@@ -92,7 +96,6 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/api/v1/files' do
-    authenticate!
     # Verificar si se envió un archivo
     unless params[:file] && params[:file][:tempfile]
       halt 400, { error: 'No se proporcionó ningún archivo' }.to_json
