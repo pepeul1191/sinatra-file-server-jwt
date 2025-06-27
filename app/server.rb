@@ -21,15 +21,20 @@ class ApplicationController < Sinatra::Base
     set :sessions, expire_after: 3600
     set :public_folder, File.join(Dir.pwd, 'uploads')
     set :constants, CONSTANTS[:local]
-    set :auth_header, ENV['AUTH_HEADER']
+    set :auth_header, ENV['HTTP_X_AUTH_TRIGGER']
     set :jwt_secret, ENV['JWT_SECRET']
   end
 
   before '/api/v1/*' do
     request_method = request.request_method
-    if %w[GET POST PUT DELETE].include?(request_method)
-      authenticate!
-      content_type :json
+    public_routes = [
+      '/api/v1/auth/generate-token'
+    ]
+    unless public_routes.include?(request.path_info)
+      if %w[GET POST PUT DELETE].include?(request_method)
+        authenticate!
+        content_type :json
+      end
     end
   end
 
