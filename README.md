@@ -14,3 +14,5 @@ Archivo .env
 
     JWT_SECRET=k8sT!mZ$4KpQbR7sCv2EaXw&9LpQ
     HTTP_X_AUTH_TRIGGER=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+    POSTMAN_API_KEY=PMAK-API
+    POSTMAN_COLLECTION_NAME=Files-Ruby-Sinatra

@@ -19,7 +19,7 @@ class ApplicationController < Sinatra::Base
   configure do
     set :session_secret, 'a4b89e6d2f4c7b98334f5e2c1e93460b2f94b24a6c9e5d073c44d4e69e839485'
     set :sessions, expire_after: 3600
-    set :public_folder, File.join(Dir.pwd, 'uploads')
+    set :public_folder, File.join(Dir.pwd, 'public')
     set :constants, CONSTANTS[:local]
     set :auth_header, ENV['HTTP_X_AUTH_TRIGGER']
     set :jwt_secret, ENV['JWT_SECRET']
@@ -51,11 +51,6 @@ class ApplicationController < Sinatra::Base
   enable :sessions # Habilitar sesiones
   
   helpers Helpers
-
-  get '/' do
-    hola()
-    'hol'
-  end
 
   post '/api/v1/auth/generate-token' do
     incoming_auth = request.env['HTTP_X_AUTH_TRIGGER']
