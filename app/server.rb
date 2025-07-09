@@ -9,10 +9,10 @@ require 'sinatra/cors'
 
 class ApplicationController < Sinatra::Base
   register Sinatra::CrossOrigin
+  use Rack::CommonLogger, Logger.new(STDOUT)
 
   # Habilitar logging
   configure :development, :production do
-    enable :logging
     enable :cross_origin
   end
 
@@ -23,6 +23,7 @@ class ApplicationController < Sinatra::Base
     set :constants, CONSTANTS[:local]
     set :auth_header, ENV['HTTP_X_AUTH_TRIGGER']
     set :jwt_secret, ENV['JWT_SECRET']
+    enable :logging
   end
 
   before '/api/v1/*' do
@@ -30,6 +31,7 @@ class ApplicationController < Sinatra::Base
     public_routes = [
       '/api/v1/auth/generate-token'
     ]
+    
     unless public_routes.include?(request.path_info)
       if %w[GET POST PUT DELETE].include?(request_method)
         authenticate!
@@ -107,6 +109,8 @@ class ApplicationController < Sinatra::Base
       original_filename = uploaded_file[:filename]
       extension = File.extname(original_filename)
       random_name = SecureRandom.uuid + extension
+      # Determinar el MIME type usando Rack::Mime
+      mime_type = Rack::Mime.mime_type(extension)
       # Crear directorio si no existe
       upload_dir = File.join('uploads', "#{folder}")
       FileUtils.mkdir_p(upload_dir) unless Dir.exist?(upload_dir)
@@ -120,9 +124,10 @@ class ApplicationController < Sinatra::Base
       {
         status: 'success',
         filename: random_name,
-        path: "/uploads/#{folder}/#{random_name}",
+        path: "#{folder}/#{random_name}",
         original_filename: original_filename,
-        size: File.size(file_path)
+        size: File.size(file_path),
+        mime_type: mime_type
       }.to_json
     rescue => e
       status 500
